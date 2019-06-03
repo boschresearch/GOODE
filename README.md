@@ -2,23 +2,27 @@
 
 This is the companion code for the paper GOODE: A Gaussian Off-the-shelf 
 Ordinary Differential Equation Solver by David John, Michael Schober and
-Vincent Heuvline. The paper is submitted to ICML 2019 and can be found here
-[TODO add link]. 
+Vincent Heuvline. The paper is submitted to ICML 2019 and can be found 
+[here](http://proceedings.mlr.press/v97/john19a.html). 
 The code allows the users to reproduce and extend the results reported in 
 the study. Please cite the above paper when reporting, reproducing or 
 extending the results.
 
-@InProceedings{john2019goode,
-	title = 	 {{GOODE: A Gaussian Off-the-shelf Ordinary Differential 
-	Equation Solver}},
-	author = 	 {John, David and Heuveline, Vincent and Schober, Michael},
-	booktitle = 	 {Proceedings of the 36th International Conference on 
-	Machine Learning},
-	pages = 	 {???},
-	year = 	 {2019},
-	series = 	 {Proceedings of Machine Learning Research},
-	publisher = 	 {PMLR}
+```
+@InProceedings{pmlr-v97-john19a,
+  title = 	 {{GOODE}: A {G}aussian Off-The-Shelf Ordinary Differential Equation Solver},
+  author = 	 {John, David and Heuveline, Vincent and Schober, Michael},
+  booktitle = 	 {Proceedings of the 36th International Conference on Machine Learning},
+  pages = 	 {3152--3162},
+  year = 	 {2019},
+  editor = 	 {Chaudhuri, Kamalika and Salakhutdinov, Ruslan},
+  volume = 	 {97},
+  series = 	 {Proceedings of Machine Learning Research},
+  address = 	 {Long Beach, California, USA},
+  month = 	 {09--15 Jun},
+  publisher = 	 {PMLR}
 }
+```
 
 ## Purpose of the project
 
