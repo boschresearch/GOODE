@@ -3,7 +3,7 @@
 This is the companion code for the paper GOODE: A Gaussian Off-the-shelf 
 Ordinary Differential Equation Solver by David John, Michael Schober and
 Vincent Heuvline. The paper is submitted to ICML 2019 and can be found 
-[here](http://proceedings.mlr.press/v97/john19a.html). 
+[here](http://proceedings.mlr.press/v97/john19a.html).
 The code allows the users to reproduce and extend the results reported in 
 the study. Please cite the above paper when reporting, reproducing or 
 extending the results.
