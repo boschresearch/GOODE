@@ -8,8 +8,8 @@
 %
 % This source code is licensed under the MIT license found in the
 % LICENSE file in the root directory of this source tree.
-% 
-% Authors: 
+%
+% Authors:
 %    David John (david.john@de.bosch.com)
 %    Michael Schober (michael.schober5@de.bosch.com)
 
@@ -44,10 +44,12 @@ n_solvers = numel(solvers);
 error = NaN(nbvp,n_solvers);
 points = NaN(nbvp,n_solvers);
 deltat = NaN(nbvp,n_solvers);
+runtime = NaN(nbvp,n_solvers);
 
 error_gp = NaN(nbvp,M);
 loglike = NaN(nbvp,M);
 deltat_gp = NaN(nbvp,1);
+runtime_gp = NaN(nbvp,1);
 esolus_mask = zeros(nbvp,1);
 
 
@@ -55,7 +57,7 @@ for ii = start:nbvp
     disp(['problem ' num2str(ii)])
     [probs,odefun,bcfun,dodefun,dbcfun,esolus,setoutputs,settolerancess]=bvp_list{ii}(ee);
     [problm,type,m,Linear,numjac,numbcjac,Vectorized,JVectorized,solinit] = probs();
-    
+
     % compute reference
     sol_ref = solver_ref(odefun,bcfun,solinit, options_ref);
     % deval(sol_ref,x); % evaluates solution at desired points
@@ -63,8 +65,9 @@ for ii = start:nbvp
     disp(npoints_ref)
     % deltat_ref = min(diff(sol_ref.x));
     % solinit_ref = bvpinit(sol_ref.x,solinit.yinit);
-    
+
     % iterate over ls_fac_vec
+    tic;
     for jj = 1:M
         ls_fac = ls_fac_vec(jj);
         try
@@ -79,7 +82,7 @@ for ii = start:nbvp
                 temp = interp1(sol_ref.x,sol_ref.y(1,:),sol.x);
             end
             error_gp(ii,jj) = norm(sol.y(1,:) - temp)/norm(temp);
-            
+
             % check if loglike tends to -Inf
             loglike_max = max(loglike(ii,1:jj-1));
             rel_change = (loglike_max-sol.loglike)/abs(loglike_max);
@@ -94,15 +97,18 @@ for ii = start:nbvp
             fprintf(2,'There was an error! The message was: %s\n',e.message);
         end
     end
-    deltat_gp(ii) = min(diff(sol.x));
+    runtime_gp(ii) = toc;
+    deltat_gp(ii) = (sol.x(end)- sol.x(1))/npoints;
 
-    
+
     % other solvers
     for jj = 1:n_solvers
         try
+            tic
             sol = solvers{jj}(odefun,bcfun,solinit,options);
+            runtime(ii,jj) = toc;
             % deval(sol_ref,x); % evaluates solution at points x
-            try 
+            try
                 esol = esolus(sol.x);
                 temp = esol(1,:);
             catch
@@ -117,9 +123,9 @@ for ii = start:nbvp
             fprintf(2,'There was an error! The message was: %s\n',e.message);
         end
     end
-    
+
 end
-%% Creat some nice plots 
+%% Creat some nice plots
 
 startup;
 marker = {'x', '+', '^', 's', 'o'};
@@ -161,7 +167,7 @@ TikzFigure('03_comparison_loglike_vs_global_opt.tex')
 figure()
 for jj = 1:n_solvers
     semilogy(1:33,error(:,jj), marker{jj}, 'Color', color_vec(jj,:), 'LineWidth', 1., 'DisplayName', func2str(solvers{jj}))
-    hold on 
+    hold on
 end
 semilogy(1:33,error_gp_min, 'o', 'Color', color_vec(our_color,:), 'LineWidth', 2., 'DisplayName', 'GOODE')
 ylabel('relative error')
@@ -182,7 +188,7 @@ TikzFigure('04_comparison_all_solver_relerr.tex')
 figure()
 for jj = 1:n_solvers
     semilogy(1:33,points(:,jj), marker{jj}, 'Color', color_vec(jj,:), 'LineWidth', 1., 'DisplayName', func2str(solvers{jj}))
-    hold on 
+    hold on
 end
 semilogy(1:33,npoints*ones(33,1), 'o', 'Color', color_vec(our_color,:), 'LineWidth', 2., 'DisplayName', 'GOODE')
 ylabel('N', 'Interpreter','latex')
@@ -207,10 +213,10 @@ std(points)
 figure()
 for jj = 1:n_solvers
     semilogy(1:33,deltat(:,jj), marker{jj}, 'Color', color_vec(jj,:), 'LineWidth', 1., 'DisplayName', func2str(solvers{jj}))
-    hold on 
+    hold on
 end
 semilogy(1:33,deltat_gp, 'o', 'Color', color_vec(our_color,:), 'LineWidth', 2., 'DisplayName', 'GOODE')
-ylabel('$h$', 'Interpreter','latex')
+ylabel('$\delta$', 'Interpreter','latex')
 xlabel('problem no.')
 % legend('Location','best')
 % title('deltat')
@@ -222,6 +228,31 @@ ax.YGrid = 'off';
 
 TikzFigure('04_comparison_all_solver_deltat.tex')
 
+mean(deltat)
+std(deltat)
+mean(deltat_gp)
+std(deltat_gp)
+
+%% plot runtime and runtime/M
+
+figure()
+for jj = 1:n_solvers
+    semilogy(1:33,runtime(:,jj), marker{jj}, 'Color', color_vec(jj,:), 'LineWidth', 1., 'DisplayName', func2str(solvers{jj}))
+    hold on
+end
+semilogy(1:33,runtime_gp, 'o', 'Color', color_vec(our_color,:), 'LineWidth', 2., 'DisplayName', 'GOODE')
+semilogy(1:33,runtime_gp/M, 'o', 'Color', color_vec(our_color-1,:), 'LineWidth', 2., 'DisplayName', 'GOODE (1/M)')
+ylabel('runtime')
+xlabel('problem no.')
+legend('Location','best')
+% title('deltat')
+% legend off
+xticks(1:2:33)
+ax = gca;
+ax.XGrid = 'on';
+ax.YGrid = 'off';
+
+TikzFigure('04_comparison_all_solver_runtime.tex')
 
 %% GP solver error and loglike vs. ls_fac
 %figure()
@@ -241,6 +272,7 @@ xlabel('lsfac')
 ylabel('relative error')
 title('Nonlinear')
 legend()
+
 
 figure()
 plot(ls_fac_vec,loglike(1:18,:)')
