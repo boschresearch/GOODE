@@ -50,6 +50,6 @@ scripts used to produce the results in the paper.
 GP BVP solver is open-sourced under the MIT license. See the
 [LICENSE](LICENSE) file for details.
 
-For a list of other open source components included in Benchmarks, see the
+For a list of other open source components included in GP BVP, see the
 file [3rd-party-licenses.txt](3rd-party-licenses.txt).
 
